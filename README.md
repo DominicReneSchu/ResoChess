@@ -48,7 +48,6 @@ cd public/ResoChess
 
 **Systemisch (empfohlen):**
 
-> Alternativ (für reinen Test):  
 > `pip install -r requirements.txt`
 
 #### 3. Tkinter (nur bei GUI-Problemen auf Raspberry Pi):
