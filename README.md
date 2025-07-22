@@ -108,15 +108,15 @@ Snapshoterstellung und Auswertung laufen nach Spielintervallen automatisch.
 
 ```text
 ResoChess/
-├── setup.py
+├── run.py
 ├── README.md
 ├── start/
 │   ├── main.py
 │   ├── ... (weitere Moduldateien, z.B. gui.py, experience_manager.py)
-│   └── __init__.py
+│   ├── __init__.py
+	└──  pieces/
 ├── data/
 ├── logs/
-├── pieces/
 ├── snapshots/
 └── learning_curve.png, learning_progress.csv
 ```
