@@ -114,7 +114,7 @@ ResoChess/
 │   ├── main.py
 │   ├── ... (weitere Moduldateien, z.B. gui.py, experience_manager.py)
 │   ├── __init__.py
-	└──  pieces/
+│   ├── _pieces/
 ├── data/
 ├── logs/
 ├── snapshots/
