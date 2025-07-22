@@ -40,17 +40,13 @@ Sämtliche Daten, Logs und Auswertungen werden systemisch gruppiert und nachvoll
 #### 1. Repository beziehen
 
 ```bash
-git clone https://github.com/DominicReneSchu/public.git
+git clone https://github.com/DominicReneSchu/ResoChess.git
 cd public/ResoChess
 ```
 
 #### 2. Abhängigkeiten & Installation
 
 **Systemisch (empfohlen):**
-
-```bash
-pip install .
-```
 
 > Alternativ (für reinen Test):  
 > `pip install -r requirements.txt`
@@ -68,23 +64,8 @@ sudo apt-get install python3-tk
 ### Windows (CMD/PowerShell) und Raspberry Pi (Terminal):
 
 ```bash
-resonanz-schach
+python run.py
 ```
-
-> Nach Installation mit `pip install .` ist dieser Befehl systemweit verfügbar.
-
-**Alternativ:**  
-Direktstart im Quellverzeichnis (z.B. für Entwicklung):
-
-```bash
-python -m start.main
-```
-oder:
-```bash
-cd start
-python main.py
-```
-
 ---
 
 ## 🖥️ Bedienung & Optionen
