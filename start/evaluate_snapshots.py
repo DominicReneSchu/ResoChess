@@ -5,16 +5,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from glob import glob
 
-# === Systemische Pfadkonstanten: immer relativ zum Projekt-Root (ResoChess) ===
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SNAPSHOT_DIR = os.path.join(BASE_DIR, "snapshots")
 OUTPUT_CSV = os.path.join(BASE_DIR, "learning_progress.csv")
 OUTPUT_PNG = os.path.join(BASE_DIR, "learning_curve.png")
 SNAPSHOT_PATTERN = re.compile(r"experience_weighted_(\d{4})\.csv")
-# Für legacy/alternative Namensschemata:
 ALT_SNAPSHOT_PATTERN = re.compile(r"experience_snapshot_(\d{5})\.csv")
 
-# Setze hier das gewünschte Qualitätsmaß – Spaltenname im CSV
 QUALITY_FIELDS = ["move_quality_score", "score", "reward", "weight"]  # Fallback-Liste
 
 def find_quality_field(header):
@@ -24,7 +21,6 @@ def find_quality_field(header):
     return None
 
 def get_snapshots_sorted():
-    # Alle passenden Files finden (verschiedene Formate akzeptieren)
     files = []
     for pattern in [SNAPSHOT_PATTERN, ALT_SNAPSHOT_PATTERN]:
         for f in os.listdir(SNAPSHOT_DIR):
@@ -33,6 +29,11 @@ def get_snapshots_sorted():
                 files.append((int(m.group(1)), os.path.join(SNAPSHOT_DIR, f)))
     files.sort()
     return files
+
+def map_result_to_quality(result):
+    # Gewichtung: Sieg=1.0, Remis=0.5, Verlust=0.0
+    result_map = {"win": 1.0, "draw": 0.5, "loss": 0.0}
+    return result_map.get(result.lower(), 0.5)
 
 def evaluate_snapshots():
     if not os.path.isdir(SNAPSHOT_DIR):
@@ -56,24 +57,35 @@ def evaluate_snapshots():
                     continue
                 header = reader.fieldnames
                 quality_field = find_quality_field(header)
-                if not quality_field:
-                    print(f"[Warnung] Keine Qualitäts-Spalte in {snap_path} gefunden – übersprungen.")
-                    continue
-                # Extrahiere Qualitätswerte (nur numerische, ggf. filtern)
+
                 values = []
-                for row in rows:
-                    try:
-                        val = float(row[quality_field])
-                        values.append(val)
-                    except (ValueError, KeyError, TypeError):
-                        continue
+                if quality_field:
+                    for row in rows:
+                        try:
+                            val = float(row[quality_field])
+                            values.append(val)
+                        except (ValueError, KeyError, TypeError):
+                            continue
+                elif "result" in header and "count" in header:
+                    # Motiv-Snapshot verarbeiten
+                    for row in rows:
+                        try:
+                            q_val = map_result_to_quality(row["result"])
+                            count = int(row["count"])
+                            values.extend([q_val] * count)
+                        except (ValueError, KeyError, TypeError):
+                            continue
+                else:
+                    print(f"[Warnung] Snapshot {snap_path} enthält keine bekannten Qualitätsdaten – übersprungen.")
+                    continue
+
                 if not values:
                     print(f"[Warnung] Keine gültigen Qualitätswerte in {snap_path} – übersprungen.")
                     continue
+
                 mean = np.mean(values)
                 std = np.std(values)
                 n = len(values)
-                # Spielanzahl schätzen: SNAPSHOT_INTERVAL * SnapNum (konservativ)
                 total_games = snap_num * 100
                 results.append({
                     "snapshot_num": snap_num,
@@ -90,7 +102,6 @@ def evaluate_snapshots():
         print("Keine auswertbaren Snapshots gefunden.")
         return
 
-    # Ergebnisse als CSV speichern
     with open(OUTPUT_CSV, "w", newline='', encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["snapshot_num", "filename", "games_total", "mean_quality", "std_quality", "n"])
         writer.writeheader()
@@ -98,7 +109,6 @@ def evaluate_snapshots():
             writer.writerow(r)
     print(f"[OK] Aggregierte Metriken gespeichert in '{OUTPUT_CSV}'.")
 
-    # Lernkurve plotten
     xs = [r["games_total"] for r in results]
     ys = [r["mean_quality"] for r in results]
     yerr = [r["std_quality"] for r in results]
@@ -106,7 +116,6 @@ def evaluate_snapshots():
     plt.figure(figsize=(10, 6))
     plt.plot(xs, ys, marker="o", label="∅ Move-Qualität")
     plt.fill_between(xs, np.array(ys)-np.array(yerr), np.array(ys)+np.array(yerr), color="#cce6ff", alpha=0.5, label="Std-Abweichung")
-    # Optional: Glättung
     if len(ys) >= 5:
         from scipy.ndimage import uniform_filter1d
         ys_smooth = uniform_filter1d(ys, size=3)
