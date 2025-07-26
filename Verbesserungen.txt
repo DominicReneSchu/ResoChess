@@ -1,0 +1,34 @@
+# === ResoChess Dualsystem & Meta-KI Setup ===
+# Enthält:
+# 1. Selfplay V2 mit Sieg-Verstärkung
+# 2. Stockfish-Match auf Maximalstärke
+# 3. Meta-KI: Zusammenführung beider Erfahrungsquellen
+
+# === 1. train_selfplay_v2.py ===
+# KI spielt gegen sich selbst mit aggressiver Siegverknüpfung
+
+# === 2. train_vs_stockfish.py ===
+# KI spielt gegen Stockfish (maximale Stärke, 1 Thread)
+# Voraussetzung: Stockfish binary installiert & im PATH
+
+# === 3. experience_merger.py ===
+# Zusammenführung:
+# - experience_selfplay.csv
+# - experience_vs_stockfish.csv
+# Ergebnis: experience_meta.csv (konsolidiert)
+
+# === 4. Parallelstart (run_dual_training.sh) ===
+# Startet beide Prozesse parallel (Linux/Raspy)
+
+# === 5. Snapshot Visualisierung ===
+# - Lernkurven Selfplay, Stockfish, Meta
+
+# === Bereitstellung folgt ===
+# Alle Module werden generiert und zur Integration bereitgestellt.
+# Ablauf: 
+# 1. Spielprozesse starten
+# 2. Snapshots auto-exportieren
+# 3. Meta-Merge periodisch
+# 4. Kurvendarstellung als Fortschritt
+
+# Status: Setup beginnt jetzt...
